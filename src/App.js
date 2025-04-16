@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import DataViewer from "./components/DataViewer";
 
 function App() {
   return (
@@ -17,6 +18,10 @@ function App() {
         >
           Learn React
         </a>
+        <div>
+          <h1>React - Spring 연동 예제</h1>
+          <DataViewer/>
+        </div>
       </header>
     </div>
   );
