@@ -1,7 +1,5 @@
-// src/components/ExampleDataViewer.jsx
 import { useEffect, useState } from 'react';
 import client from "../api/client";
-// import { fetchExampleData } from '../api/exampleApi';
 
 function DataViewer() {
     const [data, setData] = useState(null);
