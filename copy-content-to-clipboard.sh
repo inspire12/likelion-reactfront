@@ -1,42 +1,42 @@
 #!/bin/bash
 
-FILE_LIST="tree-files.txt"
-EXCLUDED_EXTENSIONS=("svg" "png" "jpg" "jpeg" "gif" "mp4" "mov" "webp" "ico" "mp3" "wav")
+TARGET_DIR=$1
 
-if [ ! -f "$FILE_LIST" ]; then
-  echo "[ERROR] $FILE_LIST 파일이 없습니다. 먼저 파일 목록을 만들어주세요."
+if [ -z "$TARGET_DIR" ]; then
+  echo "[ERROR] 사용할 폴더 경로를 지정해주세요."
+  echo "예: ./copy-folder-content.sh ./src"
   exit 1
 fi
 
-OUTPUT=""
+EXCLUDED_EXTENSIONS=("svg" "png" "jpg" "jpeg" "gif" "mp4" "mov" "webp" "ico" "mp3" "wav" "zip" "ttf" "woff" "woff2" "eot" "dmg" "pdf")
 
+# 임시 파일 생성
+TEMP_FILE=$(mktemp)
+
+# find + while로 실제 내용 누적
 while IFS= read -r file; do
   ext="${file##*.}"
   skip=false
-
-  # 확장자가 제외 목록에 있으면 skip
-  for exclude in "${EXCLUDED_EXTENSIONS[@]}"; do
-    if [[ "$ext" == "$exclude" ]]; then
+  for excluded in "${EXCLUDED_EXTENSIONS[@]}"; do
+    if [[ "$ext" == "$excluded" ]]; then
       skip=true
       break
     fi
   done
-
   if [ "$skip" = true ]; then
     continue
   fi
 
   if [ -f "$file" ]; then
-    OUTPUT+=$'// '"$file"$'\n'
-    OUTPUT+=$'-----------------------\n'
-    OUTPUT+="$(cat "$file")"
-    OUTPUT+=$'\n\n'
-  else
-    OUTPUT+=$'// '"$file (존재하지 않음)"$'\n\n'
+    echo "// $file" >> "$TEMP_FILE"
+    echo "-----------------------" >> "$TEMP_FILE"
+    cat "$file" >> "$TEMP_FILE"
+    echo -e "\n" >> "$TEMP_FILE"
   fi
-done < "$FILE_LIST"
+done < <(find "$TARGET_DIR" -type f)
 
-# 클립보드 복사 (macOS)
-echo "$OUTPUT" | pbcopy
+# 클립보드 복사
+cat "$TEMP_FILE" | pbcopy
+rm "$TEMP_FILE"
 
-echo "📋 텍스트 파일 내용이 클립보드에 복사되었습니다!"
+echo "📋 '$TARGET_DIR' 안의 텍스트 파일 내용이 클립보드에 복사되었습니다!"
