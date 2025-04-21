@@ -3,15 +3,8 @@ import client from '../api/client';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../utils/auth';
 
-const Home = () => {
-  const [user, setUser] = useState(null);
+const Home = (user) => {
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    client.get('/me')
-    .then(res => setUser(res.data))
-    .catch(() => navigate('/login'));
-  }, [navigate]);
   
   const handleLogout = () => {
     logout();
