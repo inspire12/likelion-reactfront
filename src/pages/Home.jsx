@@ -8,7 +8,7 @@ const Home = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    client.get('/security/me')
+    client.get('/me')
     .then(res => setUser(res.data))
     .catch(() => navigate('/login'));
   }, [navigate]);
