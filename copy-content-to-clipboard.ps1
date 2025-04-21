@@ -1,36 +1,32 @@
-# 파일 목록 경로
-$FileListPath = "tree-files.txt"
-
 # 제외할 확장자 목록
-$ExcludedExtensions = @("svg", "png", "jpg", "jpeg", "gif", "mp4", "mov", "webp", "ico", "mp3", "wav")
+$ExcludedExtensions = @("svg", "png", "jpg", "jpeg", "gif", "mp4", "mov", "webp", "ico", "mp3", "wav", "exe", "zip", "tar", "gz")
 
-if (!(Test-Path $FileListPath)) {
-    Write-Host "[ERROR] $FileListPath 파일이 없습니다."
-    exit
-}
+# 시작 디렉토리 (현재 디렉토리 기준)
+$StartDir = Get-Location
 
 $Output = ""
 
-# 파일 목록 반복
-Get-Content $FileListPath | ForEach-Object {
-    $File = $_
-    $Extension = [System.IO.Path]::GetExtension($File).TrimStart('.').ToLower()
+# 현재 디렉토리 기준 모든 파일 검색
+Get-ChildItem -Recurse -File | ForEach-Object {
+    $File = $_.FullName
+    $RelativePath = $File.Replace($StartDir.Path, "").TrimStart('\')
+    $Extension = $_.Extension.TrimStart('.').ToLower()
 
     if ($ExcludedExtensions -contains $Extension) {
         return
     }
 
-    if (Test-Path $File) {
-        $Output += "// $File`r`n"
+    try {
+        $Output += "// $RelativePath`r`n"
         $Output += "-----------------------`r`n"
         $Output += Get-Content $File -Raw
         $Output += "`r`n`r`n"
-    } else {
-        $Output += "// $File (존재하지 않음)`r`n`r`n"
+    } catch {
+        $Output += "// $RelativePath (읽기 실패)`r`n`r`n"
     }
 }
 
-# 클립보드에 복사
+# 클립보드 복사
 Set-Clipboard -Value $Output
 
-Write-Host "📋 텍스트 파일 내용이 클립보드에 복사되었습니다!"
+Write-Host "📋 모든 텍스트 파일 내용이 클립보드에 복사되었습니다!"
