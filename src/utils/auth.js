@@ -3,7 +3,7 @@ import client from "../api/client";
 export const getToken = () => localStorage.getItem('token');
 
 export const logout = () => {
-  client.post('/api/authen/logout')
+  client.post('/api/security/logout')
   .then(() => {
     localStorage.removeItem('token');
     alert('정상적으로 로그아웃 되었습니다.');
