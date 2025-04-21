@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: 'http://localhost:8085/api', // nginx로 주소
-    // baseURL: 'http://localhost/api', // spring backend 주소
+    // baseURL: 'http://localhost:8085/api', // nginx로 주소
+    baseURL: 'http://localhost/api', // spring backend 주소
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',

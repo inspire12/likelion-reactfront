@@ -1,117 +1,149 @@
 import React, { useState } from 'react';
 import client from '../../api/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
-const Signup = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('ROLE_USER');
-  const [message, setMessage] = useState('');
+export default function Signup() {
+  const [form, setForm] = useState({
+    username: '',
+    password: '',
+    passwordConfirm: ''
+  });
+  
+  const [passwordMatch, setPasswordMatch] = useState(true);
   const navigate = useNavigate();
   
-  const handleSignup = async (e) => {
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    const nextForm = { ...form, [name]: value };
+    setForm(nextForm);
+    if (name === 'password' || name === 'passwordConfirm') {
+      setPasswordMatch(nextForm.password === nextForm.passwordConfirm);
+    }
+  };
+  
+  const onSubmit = async (e) => {
     e.preventDefault();
+    if (!passwordMatch) {
+      return alert('비밀번호가 일치하지 않습니다.');
+    }
+    
     try {
-      const res = await client.post('/signup', { username, password, role });
-      setMessage('🎉 회원가입 성공! 2초 후 로그인 페이지로 이동합니다.');
-      setTimeout(() => navigate('/login'), 2000);
+      await client.post('/security/signup', {
+        username: form.username,
+        password: form.password
+      });
+      alert('회원가입 완료! 로그인 해주세요.');
+      navigate('/login');
     } catch (err) {
-      setMessage(err.response?.data?.error || '🚨 회원가입 실패');
+      alert('회원가입 실패: ' + (err.response?.data?.message || err.message));
     }
   };
   
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>회원가입 ✍️</h2>
-        <form onSubmit={handleSignup} style={styles.form}>
-          <input
-            style={styles.input}
-            type="text"
-            placeholder="이메일"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            required
-          />
-          <input
-            style={styles.input}
-            type="password"
-            placeholder="비밀번호"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          <select
-            style={styles.input}
-            value={role}
-            onChange={e => setRole(e.target.value)}
-          >
-            <option value="ROLE_USER">ROLE_USER</option>
-            <option value="ROLE_ADMIN">ROLE_ADMIN</option>
-          </select>
-          <button style={styles.button} type="submit">가입하기</button>
-        </form>
-        {message && <p style={styles.message}>{message}</p>}
-      </div>
-      <footer style={styles.footer}>
-        © 2024 My OAuth2 React App
-      </footer>
+      <form onSubmit={onSubmit} style={styles.form}>
+        <h2 style={styles.title}>회원가입</h2>
+        
+        <input
+          name="username"
+          placeholder="아이디"
+          value={form.username}
+          onChange={onChange}
+          required
+          style={styles.input}
+        />
+        
+        <input
+          name="password"
+          type="password"
+          placeholder="비밀번호"
+          value={form.password}
+          onChange={onChange}
+          required
+          style={styles.input}
+        />
+        
+        <input
+          name="passwordConfirm"
+          type="password"
+          placeholder="비밀번호 확인"
+          value={form.passwordConfirm}
+          onChange={onChange}
+          required
+          style={{
+            ...styles.input,
+            borderColor: passwordMatch ? '#ccc' : 'red'
+          }}
+        />
+        
+        {!passwordMatch && (
+          <div style={styles.warning}>비밀번호가 일치하지 않습니다.</div>
+        )}
+        
+        <button type="submit" style={styles.button}>가입하기</button>
+        
+        <div style={styles.loginLink}>
+          이미 계정이 있으신가요?{' '}
+          <Link to="/login" style={styles.link}>로그인</Link>
+        </div>
+      </form>
     </div>
   );
-};
+}
 
 const styles = {
   container: {
-    fontFamily: 'Arial, sans-serif',
     display: 'flex',
-    flexDirection: 'column',
+    height: '100vh',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f0f4f8',
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    textAlign: 'center',
-    width: '320px'
-  },
-  title: {
-    marginBottom: '20px',
-    fontSize: '1.6rem',
-    color: '#333',
+    background: '#f5f5f5',
   },
   form: {
+    background: 'white',
+    padding: '2rem',
+    borderRadius: '10px',
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+    width: '100%',
+    maxWidth: '400px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px'
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: '1.5rem',
   },
   input: {
-    padding: '10px',
+    padding: '0.75rem',
+    marginBottom: '1rem',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
     fontSize: '1rem',
-    borderRadius: '6px',
-    border: '1px solid #ddd'
   },
   button: {
-    padding: '12px',
-    backgroundColor: '#4A90E2',
-    color: '#fff',
-    fontSize: '1rem',
+    padding: '0.75rem',
+    backgroundColor: '#28a745',
+    color: 'white',
     border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer'
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '1rem',
   },
-  message: {
-    marginTop: '15px',
-    color: '#ff5252'
-  },
-  footer: {
-    marginTop: '20px',
-    color: '#777',
+  warning: {
+    color: 'red',
     fontSize: '0.9rem',
+    marginBottom: '1rem',
+    textAlign: 'center',
+  },
+  loginLink: {
+    marginTop: '1rem',
+    textAlign: 'center',
+    fontSize: '0.9rem',
+    color: '#555',
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none',
+    fontWeight: 'bold',
   },
 };
-
-export default Signup;

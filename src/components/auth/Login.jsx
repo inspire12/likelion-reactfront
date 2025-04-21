@@ -1,83 +1,106 @@
-import React from 'react';
+import React, { useState } from 'react';
+import client from '../../api/client';
+import { useNavigate, Link } from 'react-router-dom';
 
-const Login = () => {
+export default function Login() {
+  const [form, setForm] = useState({ username: '', password: '' });
+  const navigate = useNavigate();
   
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8085/oauth2/authorization/google';
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await client.post('/security/login', form);
+      const { token } = res.data;
+      localStorage.setItem('token', token);
+      navigate('/');
+    } catch (err) {
+      alert('로그인 실패: ' + (err.response?.data?.message || err.message));
+    }
   };
   
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>로그인 🚀</h2>
-        <p style={styles.subtitle}>소셜 계정으로 간편하게 로그인하세요.</p>
+      <form onSubmit={onSubmit} style={styles.form}>
+        <h2 style={styles.title}>로그인</h2>
+        <input
+          name="username"
+          placeholder="아이디"
+          value={form.username}
+          onChange={onChange}
+          required
+          style={styles.input}
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="비밀번호"
+          value={form.password}
+          onChange={onChange}
+          required
+          style={styles.input}
+        />
+        <button type="submit" style={styles.button}>로그인</button>
         
-        <button style={styles.googleButton} onClick={handleGoogleLogin}>
-          <img
-            src="https://img.icons8.com/color/48/000000/google-logo.png"
-            alt="google"
-            style={styles.icon}
-          />
-          구글로 로그인하기
-        </button>
-      </div>
-      
-      <footer style={styles.footer}>
-        <p>© 2024 My OAuth2 React App</p>
-      </footer>
+        <div style={styles.signupLink}>
+          계정이 없으신가요?{' '}
+          <Link to="/signup" style={styles.link}>회원가입</Link>
+        </div>
+      </form>
     </div>
   );
-};
+}
 
 const styles = {
   container: {
-    fontFamily: 'Arial, sans-serif',
+    display: 'flex',
+    height: '100vh',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#f5f5f5',
+  },
+  form: {
+    background: 'white',
+    padding: '2rem',
+    borderRadius: '10px',
+    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+    width: '100%',
+    maxWidth: '400px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f0f4f8',
-  },
-  card: {
-    backgroundColor: '#fff',
-    padding: '40px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    textAlign: 'center',
   },
   title: {
-    marginBottom: '10px',
-    fontSize: '1.8rem',
-    color: '#333',
+    textAlign: 'center',
+    marginBottom: '1.5rem',
   },
-  subtitle: {
-    marginBottom: '30px',
-    color: '#777',
-  },
-  googleButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '10px 20px',
+  input: {
+    padding: '0.75rem',
+    marginBottom: '1rem',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
     fontSize: '1rem',
-    backgroundColor: '#fff',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
+  },
+  button: {
+    padding: '0.75rem',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
     cursor: 'pointer',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    transition: 'all 0.3s ease',
+    fontSize: '1rem',
   },
-  icon: {
-    width: '24px',
-    height: '24px',
-    marginRight: '10px',
-  },
-  footer: {
-    marginTop: '20px',
-    color: '#777',
+  signupLink: {
+    marginTop: '1rem',
+    textAlign: 'center',
     fontSize: '0.9rem',
+    color: '#555',
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none',
+    fontWeight: 'bold',
   },
 };
-
-export default Login;
