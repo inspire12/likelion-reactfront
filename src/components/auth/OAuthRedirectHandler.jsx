@@ -7,10 +7,14 @@ const OAuthRedirectHandler = () => {
 
     useEffect(() => {
         const token = searchParams.get('token');
-
+        const error = searchParams.get('error');
+        
         if (token) {
             localStorage.setItem('token', token);
             navigate('/');
+        } else if (error) {
+            alert(`로그인 실패: ${error}`);
+            navigate('/login');    // 에러 있으면 로그인 페이지로 복귀
         } else {
             navigate('/login');
         }

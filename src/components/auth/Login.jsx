@@ -3,6 +3,7 @@ import React from 'react';
 const Login = () => {
   
   const handleGoogleLogin = () => {
+    // window.location.href = `${process.env.REACT_APP_API_BASE_URL}/oauth2/authorization/google?redirect_uri=${redirectUri}`;
     window.location.href = 'http://localhost/oauth2/authorization/google';
   };
   
