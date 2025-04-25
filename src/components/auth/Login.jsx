@@ -3,10 +3,11 @@ import React from 'react';
 const Login = () => {
   
   const handleGoogleLogin = () => {
-    // window.location.href = `${process.env.REACT_APP_API_BASE_URL}/oauth2/authorization/google?redirect_uri=${redirectUri}`;
-    // window.location.href = 'http://localhost:8085/oauth2/authorization/google';
     window.location.href = 'http://localhost/oauth2/authorization/google';
-    
+  };
+  
+  const handleKakaoLogin = () => {
+    window.location.href = 'http://localhost/oauth2/authorization/kakao';
   };
   
   return (
@@ -22,6 +23,14 @@ const Login = () => {
             style={styles.icon}
           />
           구글로 로그인하기
+        </button>
+        
+        <button style={styles.kakaoButton} onClick={handleKakaoLogin}>
+          <img
+            src="https://developers.kakao.com/tool/resource/static/img/button/login/full/ko/kakao_login_medium_narrow.png"
+            alt="kakao"
+            style={styles.kakaoIcon}
+          />
         </button>
       </div>
       
@@ -70,11 +79,25 @@ const styles = {
     cursor: 'pointer',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
     transition: 'all 0.3s ease',
+    marginBottom: '15px',
+    width: '100%',
   },
   icon: {
     width: '24px',
     height: '24px',
     marginRight: '10px',
+  },
+  kakaoButton: {
+    padding: 0,
+    border: 'none',
+    background: 'none',
+    cursor: 'pointer',
+    width: '100%',
+  },
+  kakaoIcon: {
+    width: '100%',
+    maxWidth: '222px',
+    height: 'auto',
   },
   footer: {
     marginTop: '20px',
